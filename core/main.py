@@ -17,7 +17,7 @@ costs_db = [
 
 # Create
 @app.post('/newcost')
-def new_cost(description : str, amount : int):
+def new_cost(description : str, amount : float):
 
     new = {
         'id' : randint(2, 100),
@@ -35,16 +35,16 @@ def show_all():
 
 # Search
 @app.get('/cost/{cost_id}')
-def search_cost(cost_id: str = Path(..., description='enter the custid')):
+def search_cost(cost_id: int = Path(..., description='enter the custid')):
     if cost_id:
         result = [information for information in costs_db if cost_id == information['id']]
         if len(result) >= 1:
-            return JSONResponse(content= result, status_code=status.HTTP_302_FOUND)
+            return JSONResponse(content= result, status_code=status.HTTP_200_OK)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= f'there is no cost like {cost_id}')
 
 # update
 @app.put('/edit/{item_id}')
-def update_cost(item_id : int, description : str, cost : int):
+def update_cost(item_id : int, description : str, cost : float):
     for item in costs_db:
         if item['id'] == item_id:
             item['description'] = description
