@@ -5,6 +5,7 @@ from random import randint
 
 app = FastAPI()
 
+# for test
 costs_db = [
     {
         'id' : 1,
