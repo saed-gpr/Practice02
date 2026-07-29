@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Query, HTTPException, status, Path
 from fastapi.responses import JSONResponse
 from typing import Optional
-from random import randint
 
 app = FastAPI()
 
