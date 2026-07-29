@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Query, HTTPException, status, Path
 from fastapi.responses import JSONResponse
 from typing import Optional
+from schema import CostCreateSchema, CostUpdateSchema
 
 app = FastAPI()
 
@@ -16,14 +17,14 @@ expenses_db = {
 
 # Create
 @app.post('/expenses')
-def new_cost(description : str, amount : float):
+def new_cost(payload: CostCreateSchema):
 
-    new_id = max(expenses_db.keys()) + 1
+    new_id = max(expenses_db.keys()) + 1 if expenses_db else 1
 
     new_expense = {
         'id' : new_id,
-        'description' : description,
-        'amount' : amount
+        'description' : payload.description,
+        'amount' : payload.amount
     }
 
     expenses_db[new_id] = new_expense
@@ -77,7 +78,7 @@ def get_expense(expense_id: int):
 
 # Update
 @app.put('/expenses/{expense_id}')
-def update_expense(expense_id: int, description: str, amount: float):
+def update_expense(expense_id: int, payload : CostUpdateSchema):
 
     if expense_id not in expenses_db:
         raise HTTPException(
@@ -85,8 +86,10 @@ def update_expense(expense_id: int, description: str, amount: float):
             detail=f"Expense with id {expense_id} not found"
         )
 
-    expenses_db[expense_id]['description'] = description
-    expenses_db[expense_id]['amount'] = amount
+    update_data = payload.model_dump(exclude_unset=True)
+
+    for key, value in update_data.items():
+        expenses_db[expense_id][key] = value
 
     return JSONResponse(
         content=expenses_db[expense_id],
